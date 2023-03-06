@@ -47,7 +47,24 @@ def pad(x,y):
 
 def subquadratic_multiply(x, y):
     ### TODO
-    pass
+  xvec = x.binary_vec
+  yvec = y.binary_vec
+  xvec, yvec = pad(xvec, yvec)
+  n = len(xvec)
+  if x.decimal_val <= 1 and y.decimal_val <= 1:
+    return BinaryNumber(x.decimal_val * y.decimal_val)
+  else:
+    x_left, x_right = split_number(xvec)
+    y_left, y_right = split_number(yvec)
+    m1 = subquadratic_multiply(x_left, y_left)
+    m2a = BinaryNumber(x_left.decimal_val + x_right.decimal_val)
+    m2b = BinaryNumber(y_left.decimal_val + y_right.decimal_val)
+    m2 = subquadratic_multiply(m2a, m2b)
+    m3 = subquadratic_multiply(x_right, y_right)
+    t1 = bit_shift(m1, n).decimal_val
+    t2 = bit_shift(BinaryNumber(m2.decimal_val - m1.decimal_val - m3.decimal_val), n//2).decimal_val
+    t3 = m3.decimal_val
+    return BinaryNumber(t1 + t2 + t3)
     ###
 
 ## Feel free to add your own tests here.
@@ -55,10 +72,18 @@ def test_multiply():
     assert subquadratic_multiply(BinaryNumber(2), BinaryNumber(2)) == 2*2
 
 def time_multiply(x, y, f):
-    start = time.time()
-    # multiply two numbers x, y using function f
-    return (time.time() - start)*1000
+  start = time.time()
+  # multiply two numbers x, y using function f
+  f(BinaryNumber(x), BinaryNumber(y))
+  return (time.time() - start)*1000
+    
+print(time_multiply(2,2,subquadratic_multiply)) ## 0.041961669921875
+print(time_multiply(5,5,subquadratic_multiply)) ## 0.055789947509765625
+print(time_multiply(10,10,subquadratic_multiply)) ## 0.14090538024902344
+print(time_multiply(20,20,subquadratic_multiply)) ## 0.16570091247558594
+print(time_multiply(40,40,subquadratic_multiply)) ## 0.16927719116210938
+print(time_multiply(80,80,subquadratic_multiply)) ## 0.1537799835205078
+print(time_multiply(150,150,subquadratic_multiply)) ## 0.42891502380371094
 
-    
-    
+
 
